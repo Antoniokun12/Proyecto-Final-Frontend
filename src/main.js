@@ -13,7 +13,8 @@ import '@quasar/extras/material-icons/material-icons.css'
 // Import Quasar css
 import 'quasar/src/css/index.sass'
 
-axios.defaults.baseURL = "http://localhost:4500/"
+// axios.defaults.baseURL = "http://localhost:4500/"
+axios.defaults.baseURL = "https://proyecto-final-aqvk.onrender.com/"
 
 const app = createApp(App)
 const pinia = (createPinia())
