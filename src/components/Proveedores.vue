@@ -21,7 +21,7 @@
           <q-item clickable v-ripple @click="listarProveedoresActivos">
             <q-item-section>Listar Activos</q-item-section>
           </q-item>
-          <q-item clickable v-ripple @click="listarProveedoresActivos">
+          <q-item clickable v-ripple @click="listarProveedoresInactivos">
             <q-item-section>Listar Inactivos</q-item-section>
           </q-item>
         </q-list>
