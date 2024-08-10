@@ -122,7 +122,24 @@ export const useAdministradorStore = defineStore("administrador", () => {
             });
             return { success: true };
         } catch (error) {
-            const errorMessage = error.response?.data?.errors?.[0]?.msg || "Error al registrar el administrador";
+            let errorMessage = "Error al registrar";
+
+            if (error.response) {
+                if (error.response.data?.errors) {
+
+                    errorMessage = error.response.data.errors[0]?.msg || errorMessage;
+                } else if (error.response.data?.error) {
+
+                    errorMessage = error.response.data.error;
+                } else {
+
+                    errorMessage = error.response.statusText || error.message;
+                }
+            } else {
+
+                errorMessage = error.message;
+            }
+
             Notify.create({
                 type: "negative",
                 message: errorMessage,
@@ -148,9 +165,27 @@ export const useAdministradorStore = defineStore("administrador", () => {
             });
             return { success: true };
         } catch (error) {
+            let errorMessage = "Error al registrar la venta";
+
+            if (error.response) {
+                if (error.response.data?.errors) {
+
+                    errorMessage = error.response.data.errors[0]?.msg || errorMessage;
+                } else if (error.response.data?.error) {
+
+                    errorMessage = error.response.data.error;
+                } else {
+
+                    errorMessage = error.response.statusText || error.message;
+                }
+            } else {
+
+                errorMessage = error.message;
+            }
+
             Notify.create({
                 type: "negative",
-                message: error.response.data.errors[0].msg,
+                message: errorMessage,
             });
             return { success: false };
         } finally {

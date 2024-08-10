@@ -585,6 +585,10 @@ const isOpen = (section) => {
 
 const toggleLeftDrawer = () => {
   leftDrawerOpen.value = !leftDrawerOpen.value;
+
+  for (let section in sections.value) {
+    sections.value[section] = false;
+  }
 };
 
 const toggleRightDrawer = () => {

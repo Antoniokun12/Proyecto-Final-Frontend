@@ -79,7 +79,7 @@
                   <q-tooltip
                     class="bg-indigo rounded-borders row flex-center"
                     :offset="[10, 10]"
-                    style="width: 120px; height: 40px; font-size: 15px"
+                    style="width: 200px; height: 40px; font-size: 15px"
                   >
                     Editar Administrador
                   </q-tooltip>
@@ -142,19 +142,28 @@
 
     <div class="q-pa-md">
       <q-dialog v-model="showForm">
-        <q-card>
+        <q-card style="width: 400px; border-radius: 15px;">
           <q-card-section>
             <q-form @submit.prevent="agregarOEditarAdministrador">
-              <h1
+              <div
                 style="
-                  font-size: 30px;
-                  text-align: center;
-                  margin: 0;
-                  line-height: 50px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin-bottom: 20px;
+                  border: 2px solid #000000; /* Color del borde */
+                  border-radius: 8px; /* Borde redondeado */
                 "
               >
-                Administrador
-              </h1>
+                <q-avatar size="80px">
+                  <img
+                    src="https://e7.pngegg.com/pngimages/889/101/png-clipart-computer-icons-natural-environment-nature-natural-resource-coral-collection-leaf-hand.png"
+                  />
+                </q-avatar>
+                <h1 style="font-size: 30px; margin: 0; margin-left: 15px">
+                  Administrador
+                </h1>
+              </div>
               <q-input
                 v-model.trim="nombre"
                 label="Nombre Administrador"
@@ -181,7 +190,9 @@
                   />
                 </template>
               </q-input>
-              <div style="margin-top: 15px">
+              <div
+                style="margin-top: 15px; display: flex; justify-content: center"
+              >
                 <q-btn
                   label="Cancelar"
                   color="negative"
@@ -296,13 +307,16 @@ async function agregarOEditarAdministrador() {
       password: password.value,
       cedula: cedula.value,
       direccion: direccion.value,
-      municipio: municipio.value
+      municipio: municipio.value,
     };
 
     let result;
 
     if (administradorId.value) {
-      result = await useAdministradores.putAdministrador(administradorId.value, data);
+      result = await useAdministradores.putAdministrador(
+        administradorId.value,
+        data
+      );
     } else {
       result = await useAdministradores.postAdministrador(data);
     }
@@ -315,7 +329,6 @@ async function agregarOEditarAdministrador() {
     console.error(error);
   }
 }
-
 
 function cancelarAgregarAdministrador() {
   showForm.value = false;
@@ -330,7 +343,6 @@ function cancelarAgregarAdministrador() {
   password.value = "";
 }
 
-
 function editarAdministrador(administrador) {
   nombre.value = administrador.nombre;
   email.value = administrador.email;
@@ -344,17 +356,14 @@ function editarAdministrador(administrador) {
   showForm.value = true;
 }
 
-
-async function obtenerAdministradorPorID() {
-  if (selectedUserId.value) {
-    const result = await useAdministradores.getAdministradorByID(
-      selectedUserId.value
+async function obtenerAdministradorPorID(selectedUserId) {
+  try {
+    const administrador = await useAdministradores.getAdministradorByID(
+      selectedUserId
     );
-    if (result.success) {
-      nombre.value = result.administrador.nombre;
-      email.value = result.administrador.email;
-      telefono.value = result.administrador.telefono;
-    }
+    rows.value = [administrador]; // Actualiza la tabla con el usuario seleccionado
+  } catch (error) {
+    console.error(error);
   }
 }
 
@@ -369,7 +378,10 @@ async function activarAdministrador(administrador) {
 
 async function desactivarAdministrador(administrador) {
   try {
-    await useAdministradores.toggleEstadoAdministrador(administrador._id, false);
+    await useAdministradores.toggleEstadoAdministrador(
+      administrador._id,
+      false
+    );
     listarAdministradores();
   } catch (error) {
     console.error(error);
