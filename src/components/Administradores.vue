@@ -1,21 +1,5 @@
 <template>
   <q-page>
-    <q-drawer v-model="drawer" side="left" bordered>
-      <q-list>
-        <q-expansion-item
-          label="Gestión Administrativa"
-          icon="settings"
-          expand-separator
-          default-opened
-        >
-          <q-item clickable v-ripple @click="listarAdministradores">
-            <q-item-section>Administrador</q-item-section>
-          </q-item>
-          <!-- Otros items pueden ser añadidos aquí -->
-        </q-expansion-item>
-      </q-list>
-    </q-drawer>
-
     <div class="q-pa-md text-center">
       <div class="text-h2">Administradores</div>
       <q-btn
