@@ -187,7 +187,9 @@
                   />
                 </template>
               </q-input>
-              <div style="margin-top: 15px; display: flex; justify-content: center">
+              <div
+                style="margin-top: 15px; display: flex; justify-content: center"
+              >
                 <q-btn
                   label="Cancelar"
                   color="negative"

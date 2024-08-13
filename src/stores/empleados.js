@@ -7,7 +7,6 @@ import { useAdministradorStore } from "../stores/administrador.js"
 
 export const useEmpleadosStore = defineStore("empleados", () => {
     let loading = ref(false);
-    let token = ref("");
     const useUsuario = useAdministradorStore();
     let empleados = ref({
         nombre: '',
@@ -198,7 +197,6 @@ export const useEmpleadosStore = defineStore("empleados", () => {
         postEmpleados,
         putEmpleados,
         toggleEstadoEmpleados,
-        token,
         loading,
         empleados,
         clearEmpleados

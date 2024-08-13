@@ -94,8 +94,9 @@ export const useAdministradorStore = defineStore("administrador", () => {
             console.log(req);
             if (req.status === 200) {
                 token.value = req.data.token;
-                administrador.value = req.data.usuario; // Asigna los datos correctamente
-                console.log(administrador.value); // Verifica los datos en consola
+                administrador.value = req.data.usuario; 
+                console.log(administrador.value); 
+                console.log(token);
                 return true;
             }
             return false;

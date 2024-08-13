@@ -6,9 +6,8 @@ import { useAdministradorStore } from "../stores/administrador.js"
 
 export const useProveedorStore = defineStore("proveedor", () => {
   let loading = ref(false);
-  let token = ref("");
   const proveedor = ref(null);
-  const useUsuario = useAdministradorStore();
+  const useAdmin = useAdministradorStore();
 
 
   const proveedores = ref([]);
@@ -18,7 +17,7 @@ export const useProveedorStore = defineStore("proveedor", () => {
     try {
       let res = await axios.get(`api/proveedores/listar`, {
         headers: {
-          "x-token": useUsuario.token,
+          "x-token": useAdmin.token,
         },
       });
       proveedores.value = res.data.proveedores || [];
@@ -36,7 +35,7 @@ export const useProveedorStore = defineStore("proveedor", () => {
     try {
       let res = await axios.get(`api/proveedores/listarid/${id}`, {
         headers: {
-          "x-token": token.value,
+          "x-token": useAdmin.token,
         },
       });
       proveedor.value = res.data.proveedor;
@@ -54,7 +53,7 @@ export const useProveedorStore = defineStore("proveedor", () => {
     try {
       let res = await axios.get(`api/proveedores/listaractivados`, {
         headers: {
-          "x-token": token.value,
+          "x-token": useAdmin.token,
         },
       });
       proveedores.value = res.data.activados || [];
@@ -72,7 +71,7 @@ export const useProveedorStore = defineStore("proveedor", () => {
     try {
       let res = await axios.get(`api/proveedores/listardesactivados`, {
         headers: {
-          "x-token": token.value,
+          "x-token": useAdmin.token,
         },
       });
       proveedores.value = res.data.desactivados || [];
@@ -90,7 +89,7 @@ export const useProveedorStore = defineStore("proveedor", () => {
     try {
       let req = await axios.post(`api/proveedores/escribir`, data, {
         headers: {
-          "x-token": token.value,
+          "x-token": useAdmin.token,
         },
       });
       Notify.create({
@@ -123,7 +122,7 @@ export const useProveedorStore = defineStore("proveedor", () => {
     try {
       let req = await axios.put(`api/proveedores/modificar/${id}`, data, {
         headers: {
-          "x-token": token.value,
+          "x-token": useAdmin.token,
         },
       });
       Notify.create({
@@ -159,7 +158,7 @@ export const useProveedorStore = defineStore("proveedor", () => {
         : `api/proveedores/desactivar/${id}`;
       let req = await axios.put(url, {}, {
         headers: {
-          "x-token": token.value,
+          "x-token": useAdmin.token,
         },
       });
       return req.data;
@@ -179,7 +178,6 @@ export const useProveedorStore = defineStore("proveedor", () => {
     postProveedor,
     putProveedor,
     toggleEstadoProveedor,
-    token,
     loading,
   };
 }, {

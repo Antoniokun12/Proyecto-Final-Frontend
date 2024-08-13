@@ -156,7 +156,7 @@
               <q-input v-model.trim="direccion" label="Dirección" required />
               <q-input v-model.trim="telefono" label="Teléfono" required />
               <q-input v-model.trim="email" label="Email" required />
-              
+
               <div
                 style="margin-top: 15px; display: flex; justify-content: center"
               >
@@ -226,9 +226,9 @@ async function listarProveedores() {
   try {
     const r = await useProveedores.getProveedores();
     rows.value = r.proveedores || [];
-    proveedorOptions.value = r.proveedores.map(p => ({
+    proveedorOptions.value = r.proveedores.map((p) => ({
       value: p._id,
-      label: p.nombre
+      label: p.nombre,
     }));
   } catch (error) {
     console.error(error);
@@ -236,8 +236,6 @@ async function listarProveedores() {
     proveedorOptions.value = [];
   }
 }
-
-
 
 async function listarProveedoresActivos() {
   try {
@@ -278,7 +276,7 @@ async function agregarOEditarProveedor() {
 
     if (result.success) {
       listarProveedores(); // Actualiza la lista de proveedores después de agregar o editar
-      showForm.value = false;   // Cierra el formulario solo si la operación fue exitosa
+      showForm.value = false; // Cierra el formulario solo si la operación fue exitosa
     } else {
       console.error(result.error); // Agrega un mensaje de error si la operación falla
     }
@@ -286,7 +284,6 @@ async function agregarOEditarProveedor() {
     console.error(error);
   }
 }
-
 
 function cancelarAgregarProveedor() {
   showForm.value = false;
@@ -308,7 +305,9 @@ function editarProveedor(proveedor) {
 
 async function obtenerProveedorPorID(selectedProveedorId) {
   try {
-    const proveedor = await useProveedores.getProveedorByID(selectedProveedorId);
+    const proveedor = await useProveedores.getProveedorByID(
+      selectedProveedorId
+    );
     if (proveedor) {
       rows.value = [proveedor];
     } else {
@@ -318,8 +317,6 @@ async function obtenerProveedorPorID(selectedProveedorId) {
     console.error(error);
   }
 }
-
-
 
 async function activarProveedor(proveedor) {
   try {
