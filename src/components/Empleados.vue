@@ -171,22 +171,6 @@
                 label="FechaContrato"
                 required
               />
-              <q-input
-                v-if="!isEditing"
-                v-model.trim="password"
-                label="Contraseña"
-                :type="showPassword ? 'text' : 'password'"
-                required
-              >
-                <template v-slot:append>
-                  <q-icon
-                    :name="showPassword ? 'visibility_off' : 'visibility'"
-                    @click="togglePasswordVisibility"
-                    class="cursor-pointer"
-                    size="20px"
-                  />
-                </template>
-              </q-input>
               <div
                 style="margin-top: 15px; display: flex; justify-content: center"
               >
@@ -220,7 +204,6 @@ const correo = ref("");
 const documento = ref("");
 const direccion = ref("");
 const telefono = ref("");
-const password = ref("");
 const selectedEmpleadosId = ref("");
 const fechaNacimiento = ref("");
 const estudios = ref("");
@@ -229,7 +212,6 @@ const fechaContratacion = ref("");
 const empleadosId = ref(null);
 //   const administradorId = ref(null); // Para almacenar el ID del administrador en edición
 
-const isEditing = ref(false);
 const showPassword = ref(false);
 
 const rows = ref([]);
@@ -351,7 +333,6 @@ async function agregarOEditarEmpleados() {
       nombre: nombre.value,
       correo: correo.value,
       telefono: telefono.value,
-      password: password.value,
       documento: documento.value,
       direccion: direccion.value,
       fechaNacimiento: fechaNacimiento.value,
@@ -379,7 +360,6 @@ async function agregarOEditarEmpleados() {
 
 function cancelarAgregarEmpleados() {
   showForm.value = false;
-  isEditing.value = false;
   empleadosId.value = null;
   nombre.value = "";
   correo.value = "";
@@ -390,7 +370,6 @@ function cancelarAgregarEmpleados() {
   estudios.value = "";
   descripcion.value = "";
   fechaContratacion.value = "";
-  password.value = "";
 }
 
 function editarEmpleados(empleados) {
@@ -399,13 +378,16 @@ function editarEmpleados(empleados) {
   telefono.value = empleados.telefono;
   documento.value = empleados.documento;
   direccion.value = empleados.direccion;
-  fechaNacimiento.value = empleados.fechaNacimiento;
+  // fechaNacimiento.value = empleados.fechaNacimiento;
   estudios.value = empleados.estudios;
   descripcion.value = empleados.descripcion;
-  fechaContratacion.value = empleados.fechaContratacion;
-  password.value = ""; // La contraseña no se muestra
+  // fechaContratacion.value = empleados.fechaContratacion;
+  fechaNacimiento.value = new Date(empleados.fechaNacimiento).toISOString().substring(0, 10);
+  fechaContratacion.value = new Date(empleados.fechaContratacion).toISOString().substring(0, 10);
+
+  empleadosId.value = empleados._id;
+  // La contraseña no se muestra
   // administradorId.value = administrador._id; // Almacena el ID del administrador en edición
-  isEditing.value = true;
   showForm.value = true;
 }
 

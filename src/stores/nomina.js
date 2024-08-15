@@ -1,36 +1,21 @@
-
 import { defineStore } from "pinia";
 import axios from "axios";
 import { ref } from "vue";
 import { Notify } from "quasar";
 import { useAdministradorStore } from "../stores/administrador.js"
 
-export const useEmpleadosStore = defineStore("empleados", () => {
-    let loading = ref(false);
+export const useNominaStore = defineStore("nomina", () => {
+    const loading = ref(false);
     const useUsuario = useAdministradorStore();
-    let empleados = ref({
-        nombre: '',
-        documento: '',
-        direccion: '',
-        correo: '',
-        telefono: '',
-        estudios: '',
-        fechaNacimiento: '',
-        descripcion: '',
-        fechaContrato: ''
 
-    });
-    const empleado = ref([]);
-
-    let getEmpleados = async () => {
+    const getNominas = async () => {
         loading.value = true;
         try {
-            let res = await axios.get(`api/empleados/listar`, {
+            const res = await axios.get(`api/nomina/listar`, {
                 headers: {
                     "x-token": useUsuario.token,
                 },
             });
-            empleado.value = res.data.empleados || [];
             return res.data;
         } catch (error) {
             console.log(error);
@@ -40,15 +25,31 @@ export const useEmpleadosStore = defineStore("empleados", () => {
         }
     };
 
-    let getEmpleadosActivos = async () => {
+    const getNominaByID = async (id) => {
         loading.value = true;
         try {
-            let res = await axios.get(`api/empleados/listaractivados`, {
+            const res = await axios.get(`api/nomina/listarid/${id}`, {
                 headers: {
                     "x-token": useUsuario.token,
                 },
             });
-            empleado.value = res.data.activados || [];
+            return res.data.nomina;
+        } catch (error) {
+            console.log(error);
+            return error;
+        } finally {
+            loading.value = false;
+        }
+    };
+
+    const getNominasActivas = async () => {
+        loading.value = true;
+        try {
+            const res = await axios.get(`api/nomina/listar/activadas`, {
+                headers: {
+                    "x-token": useUsuario.token,
+                },
+            });
             return res.data;
         } catch (error) {
             console.log(error);
@@ -58,15 +59,14 @@ export const useEmpleadosStore = defineStore("empleados", () => {
         }
     };
 
-    let getEmpleadosInactivos = async () => {
+    const getNominasInactivas = async () => {
         loading.value = true;
         try {
-            let res = await axios.get(`api/empleados/listardesactivados`, {
+            const res = await axios.get(`api/nomina/listar/desactivadas`, {
                 headers: {
                     "x-token": useUsuario.token,
                 },
             });
-            empleado.value = res.data.desactivados || [];
             return res.data;
         } catch (error) {
             console.log(error);
@@ -76,39 +76,27 @@ export const useEmpleadosStore = defineStore("empleados", () => {
         }
     };
 
-    let getEmpleadosByID = async (id) => {
+    const postNomina = async (data) => {
         loading.value = true;
         try {
-            let res = await axios.get(`api/empleados/listarid/${id}`, {
-                headers: {
-                    "x-token": useUsuario.token,
-                },
-            });
-            return res.data.empleado;
-        } catch (error) {
-            console.log(error);
-            return error;
-        } finally {
-            loading.value = false;
-        }
-    };
-
-    let postEmpleados = async (r) => {
-        loading.value = true;
-        try {
-            let req = await axios.post(`api/empleados/escribir`, r, {
+            const req = await axios.post(`api/nomina/escribir`, data, {
                 headers: {
                     "x-token": useUsuario.token,
                 },
             });
             Notify.create({
-                message: `empleado registrado correctamente`,
+                message: `Nómina registrada correctamente`,
                 color: "positive",
                 position: "top",
             });
-            return { success: true };
+            return { success: true, nomina: req.data.nomina };
         } catch (error) {
-            const errorMessage = error.response?.data?.errors?.[0]?.msg || "Error al registrar el empleado";
+            let errorMessage = "Error al registrar la nómina";
+            if (error.response && error.response.data?.error) {
+                errorMessage = error.response.data.error;
+            } else {
+                errorMessage = error.message;
+            }
             Notify.create({
                 type: "negative",
                 message: errorMessage,
@@ -119,24 +107,30 @@ export const useEmpleadosStore = defineStore("empleados", () => {
         }
     };
 
-    let putEmpleados = async (id, data) => {
+    const putNomina = async (id, data) => {
         loading.value = true;
         try {
-            let req = await axios.put(`api/empleados/modificar/${id}`, data, {
+            const req = await axios.put(`api/nomina/modificar/${id}`, data, {
                 headers: {
                     "x-token": useUsuario.token,
                 },
             });
             Notify.create({
-                message: `empleados editado correctamente`,
+                message: `Nómina actualizada correctamente`,
                 color: "positive",
                 position: "top",
             });
-            return { success: true };
+            return { success: true, nomina: req.data.nomina };
         } catch (error) {
+            let errorMessage = "Error al actualizar la nómina";
+            if (error.response && error.response.data?.error) {
+                errorMessage = error.response.data.error;
+            } else {
+                errorMessage = error.message;
+            }
             Notify.create({
                 type: "negative",
-                message: error.response.data.errors[0].msg,
+                message: errorMessage,
             });
             return { success: false };
         } finally {
@@ -144,13 +138,13 @@ export const useEmpleadosStore = defineStore("empleados", () => {
         }
     };
 
-    let toggleEstadoEmpleados = async (id, activar) => {
+    const toggleEstadoNomina = async (id, activar) => {
         loading.value = true;
         try {
             const url = activar
-                ? `api/empleados/activar/${id}`
-                : `api/empleados/desactivar/${id}`;
-            let req = await axios.put(url, {}, {
+                ? `api/nomina/activar/${id}`
+                : `api/nomina/desactivar/${id}`;
+            const req = await axios.put(url, {}, {
                 headers: {
                     "x-token": useUsuario.token,
                 },
@@ -164,22 +158,15 @@ export const useEmpleadosStore = defineStore("empleados", () => {
         }
     };
 
-    const clearEmpleados = () => {
-        empleado.value = null;
-        token.value = null;
-    };
-
     return {
-        getEmpleados,
-        getEmpleadosActivos,
-        getEmpleadosInactivos,
-        getEmpleadosByID,
-        postEmpleados,
-        putEmpleados,
-        toggleEstadoEmpleados,
+        getNominas,
+        getNominaByID,
+        getNominasActivas,
+        getNominasInactivas,
+        postNomina,
+        putNomina,
+        toggleEstadoNomina,
         loading,
-        empleados,
-        clearEmpleados
     };
 }, {
     persist: true,
