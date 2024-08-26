@@ -111,6 +111,20 @@
             </q-item>
           </router-link>
           <router-link
+            to="/comprador"
+            class="drawer-link"
+            active-class="drawer-link-active"
+          >
+            <q-item clickable v-ripple>
+              <q-item-section avatar>
+                <q-icon name="shopping_cart" size="36px" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>Compradores</q-item-label>
+              </q-item-section>
+            </q-item>
+          </router-link>
+          <router-link
             to="/factura"
             class="drawer-link"
             active-class="drawer-link-active"

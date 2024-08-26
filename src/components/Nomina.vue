@@ -191,8 +191,6 @@ const valor = ref(0);
 const selectedNominaId = ref("");
 const nominaId = ref(null);
 
-const isEditing = ref(false);
-
 const rows = ref([]);
 const columns = ref([
   {
@@ -301,7 +299,6 @@ async function agregarOEditarNomina() {
 
 function cancelarAgregarNomina() {
   showForm.value = false;
-  isEditing.value = false;
   nominaId.value = null;
   idEmpleado.value = "";
   tipo.value = "";
@@ -313,7 +310,6 @@ function editarNomina(nomina) {
   tipo.value = nomina.tipo;
   valor.value = nomina.valor;
   nominaId.value = nomina._id;
-  isEditing.value = true;
   showForm.value = true;
 }
 
