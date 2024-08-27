@@ -249,13 +249,13 @@ onMounted(async () => {
 
 async function listarParcelas() {
   try {
-    const r = await useParcela.getParcelasActivos();
-    // console.log("Respuesta de getParcelasActivos:", res);
-    if (r && Array.isArray(r.activados)) {
+    const res = await useParcela.getParcelasActivos();
+    console.log("Respuesta de getParcelasActivos:", res);
+    if (res && Array.isArray(res.activados)) {
       parcelaTodo.value = res.activados;
       console.log("Parcelas cargadas:", JSON.stringify(parcelaTodo.value, null, 2));
     } else {
-      console.error("Respuesta inesperada al listar parcelas:", r);
+      console.error("Respuesta inesperada al listar parcelas:", res);
       parcelaTodo.value = [];
     }
   } catch (error) {
@@ -320,26 +320,9 @@ function getParcelanumero(id) {
 async function listarCultivosActivos() {
   try {
     const r = await useCultivos.getCultivosActivos();
-    if (r && Array.isArray(r.activados)) {
-      const CultivoRecienteId = obtenerCultivoReciente();
-      rows.value = r.activados.map(cultivo => {
-        const Parcelanumero = getParcelanumero(cultivo.idParcela);
-        return {
-          ...cultivo,
-          Parcelanumero: Parcelanumero
-        };
-      }).sort((a, b) => {
-        if (a._id === CultivoRecienteId) return -1;
-        if (b._id === CultivoRecienteId) return 1;
-        return 0;
-      });
-      console.log("Filas ordenadas:", rows.value);
-    } else {
-      console.error("Datos inesperados del servidor:", res);
-      rows.value = [];
-    }
+    rows.value = r.activados || [];
   } catch (error) {
-    console.error("Error al listar cultivos:", error);
+    console.error(error);
     rows.value = [];
   }
 }
@@ -347,26 +330,9 @@ async function listarCultivosActivos() {
 async function listarCultivosInactivos() {
   try {
     const r = await useCultivos.getCultivosInactivos();
-    if (r && Array.isArray(r.desactivados)) {
-      const CultivoRecienteId = obtenerCultivoReciente();
-      rows.value = r.desactivados.map(cultivo => {
-        const Parcelanumero = getParcelanumero(cultivo.idParcela);
-        return {
-          ...cultivo,
-          Parcelanumero: Parcelanumero
-        };
-      }).sort((a, b) => {
-        if (a._id === CultivoRecienteId) return -1;
-        if (b._id === CultivoRecienteId) return 1;
-        return 0;
-      });
-      console.log("Filas ordenadas:", rows.value);
-    } else {
-      console.error("Datos inesperados del servidor:", res);
-      rows.value = [];
-    }
+    rows.value = r.desactivados || [];
   } catch (error) {
-    console.error("Error al listar cultivos:", error);
+    console.error(error);
     rows.value = [];
   }
 }

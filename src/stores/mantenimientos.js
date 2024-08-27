@@ -1,19 +1,18 @@
-
 import { defineStore } from "pinia";
 import axios from "axios";
 import { ref } from "vue";
 import { Notify } from "quasar";
 import { useAdministradorStore } from "../stores/administrador.js";
-export const useMaquinariasStore = defineStore("maquinarias", () => {
+export const useMantenimientosStore = defineStore("mantenimiento", () => {
     const useUsuario = useAdministradorStore()
     let loading = ref(false);
 
 
 
-    let getMaquinarias = async () => {
+    let getManteni = async () => {
         loading.value = true;
         try {
-            let res = await axios.get(`api/maquinasherramienta/listar`, {
+            let res = await axios.get(`api/mantenimiento/listar`, {
                 headers: {
                     "x-token": useUsuario.token,
                 },
@@ -30,10 +29,10 @@ export const useMaquinariasStore = defineStore("maquinarias", () => {
         }
     };
 
-    let getMaquinariasActivos = async () => {
+    let getManteniActivos = async () => {
         loading.value = true;
         try {
-            let res = await axios.get(`api/maquinasherramienta/listaractivados`, {
+            let res = await axios.get(`api/mantenimiento/listaractivados`, {
                 headers: {
                     "x-token": useUsuario.token,
                 },
@@ -47,10 +46,10 @@ export const useMaquinariasStore = defineStore("maquinarias", () => {
         }
     };
 
-    let getMaquinariasInactivos = async () => {
+    let getManteniInactivos = async () => {
         loading.value = true;
         try {
-            let res = await axios.get(`api/maquinasherramienta/listardesactivados`, {
+            let res = await axios.get(`api/mantenimiento/listardesactivados`, {
                 headers: {
                     "x-token": useUsuario.token,
                 },
@@ -64,10 +63,10 @@ export const useMaquinariasStore = defineStore("maquinarias", () => {
         }
     };
 
-    let getMaquinariasByID = async (id) => {
+    let getManteniByID = async (id) => {
         loading.value = true;
         try {
-            let res = await axios.get(`api/maquinasherramienta/listarid/${id}`, {
+            let res = await axios.get(`api/mantenimiento/listarid/${id}`, {
                 headers: {
                     "x-token": useUsuario.token,
                 },
@@ -81,22 +80,22 @@ export const useMaquinariasStore = defineStore("maquinarias", () => {
         }
     };
 
-    let postMaquinarias = async (r) => {
+    let postManteni = async (r) => {
         loading.value = true;
         try {
-            let req = await axios.post(`api/maquinasherramienta/escribir`, r, {
+            let req = await axios.post(`api/mantenimiento/escribir`, r, {
                 headers: {
                     "x-token": useUsuario.token,
                 },
             });
             Notify.create({
-                message: `Maquinaria registrado correctamente`,
+                message: `Mantenimiento registrado correctamente`,
                 color: "positive",
                 position: "top",
             });
             return { success: true };
         } catch (error) {
-            const errorMessage = error.response?.data?.errors?.[0]?.msg || "Error al registrar la maquinaria";
+            const errorMessage = error.response?.data?.errors?.[0]?.msg || "Error al registrar la mantenimiento";
             Notify.create({
                 type: "negative",
                 message: errorMessage,
@@ -107,16 +106,16 @@ export const useMaquinariasStore = defineStore("maquinarias", () => {
         }
     };
 
-    let putMaquinarias = async (id, data) => {
+    let putManteni = async (id, data) => {
         loading.value = true;
         try {
-            let req = await axios.put(`api/maquinasherramienta/modificar/${id}`, data, {
+            let req = await axios.put(`api/mantenimiento/modificar/${id}`, data, {
                 headers: {
                     "x-token": useUsuario.token,
                 },
             });
             Notify.create({
-                message: `Maquinarias editado correctamente`,
+                message: `Mantenimiento editado correctamente`,
                 color: "positive",
                 position: "top",
             });
@@ -132,12 +131,12 @@ export const useMaquinariasStore = defineStore("maquinarias", () => {
         }
     };
 
-    let toggleEstadoMaquinarias = async (id, activar) => {
+    let toggleEstadoManteni = async (id, activar) => {
         loading.value = true;
         try {
             const url = activar
-                ? `api/maquinasherramienta/activar/${id}`
-                : `api/maquinasherramienta/desactivar/${id}`;
+                ? `api/mantenimiento/activar/${id}`
+                : `api/mantenimiento/desactivar/${id}`;
             let req = await axios.put(url, {}, {
                 headers: {
                     "x-token": useUsuario.token,
@@ -155,15 +154,14 @@ export const useMaquinariasStore = defineStore("maquinarias", () => {
 
 
     return {
-        getMaquinarias,
-        getMaquinariasActivos,
-        getMaquinariasInactivos,
-        getMaquinariasByID,
-        postMaquinarias,
-        putMaquinarias,
-        toggleEstadoMaquinarias,
+        getManteni,
+        getManteniActivos,
+        getManteniInactivos,
+        getManteniByID,
+        postManteni,
+        putManteni,
+        toggleEstadoManteni,
         loading,
-
     };
 }, {
     persist: true,

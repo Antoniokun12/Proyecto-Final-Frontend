@@ -351,50 +351,20 @@ function getFincanombre(id) {
 async function listarParcelasActivos() {
   try {
     const r = await useParcelas.getParcelasActivos();
-    if (r && Array.isArray(r.activados)) {
-      const ParcelaRecienteId = obtenerParcelaReciente();
-      rows.value = r.activados.map(parcela => {
-        const fincanombre = getFincanombre(parcela.idFinca);
-        return {
-          ...parcela,
-          fincanombre: fincanombre
-        };
-      }).sort((a, b) => {
-        if (a._id === ParcelaRecienteId) return -1;
-        if (b._id === ParcelaRecienteId) return 1;
-        return 0;
-      });
-      console.log("Filas ordenadas:", rows.value);
-    } else {
-      console.error("Datos inesperados del servidor:", res);
-    }
+    rows.value = r.activados || [];
   } catch (error) {
-    console.error("Error al listar parcelas:", error);
+    console.error(error);
+    rows.value = [];
   }
 }
 
 async function listarParcelasInactivos() {
   try {
     const r = await useParcelas.getParcelasInactivos();
-    if (r && Array.isArray(r.desactivados)) {
-      const ParcelaRecienteId = obtenerParcelaReciente();
-      rows.value = r.desactivados.map(parcela => {
-        const fincanombre = getFincanombre(parcela.idFinca);
-        return {
-          ...parcela,
-          fincanombre: fincanombre
-        };
-      }).sort((a, b) => {
-        if (a._id === ParcelaRecienteId) return -1;
-        if (b._id === ParcelaRecienteId) return 1;
-        return 0;
-      });
-      console.log("Filas ordenadas:", rows.value);
-    } else {
-      console.error("Datos inesperados del servidor:", res);
-    }
+    rows.value = r.desactivados || [];
   } catch (error) {
-    console.error("Error al listar parcelas:", error);
+    console.error(error);
+    rows.value = [];
   }
 }
 
@@ -405,7 +375,7 @@ async function agregarOEditarParcela() {
 
     const data = {
       idFinca: idFincaValue, // Utiliza el valor adecuado para `POST` o `PUT`
-      ubicacionGeografica: ubicacionGeografica.value.map(geo => ({ latitud: geo.latitud, longitud: geo.longitud })),
+  ubicacionGeografica: ubicacionGeografica.value.map(geo => ({ latitud: geo.latitud, longitud: geo.longitud })),
       numero: numero.value,
       cultivoAnterior: cultivoAnterior.value,
       cultivoActual: cultivoActual.value,
