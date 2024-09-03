@@ -413,7 +413,7 @@ async function agregarOEditarParcela() {
 function cancelarAgregarParcela() {
   showForm.value = false;
   parcelaId.value = null;
-  ubicacionGeografica.value = "";
+  ubicacionGeografica.value = [{ latitud: '', longitud: '' }];
   idFinca.value = "";
   // numero.value = "";
   cultivoAnterior.value = "";

@@ -544,7 +544,7 @@ const selectedParcela = parcelaTodo.value.find(parcela => parcela._id === prepar
   
   if (selectedParcela) {
     idParcela.value = {
-      label: `${selectedParcela.numero} - ${selectedParcela.ubicacion}`,
+      label: `${selectedParcela.numero} - ${selectedParcela.detalle}`,
       value: selectedParcela._id,
       nombre: selectedParcela.nombre
     };
