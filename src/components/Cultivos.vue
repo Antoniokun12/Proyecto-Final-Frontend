@@ -267,7 +267,7 @@ async function listarParcelas() {
 const organizarParcelas = computed(() => {
   console.log("Calculando organizarParcelas", parcelaTodo.value);
   return parcelaTodo.value.map((element) => ({
-    label: `${element.numero}`,
+    label: `${element.numero}-${element.detalle}`,
     value: element._id,
     nombre: element.nombre,
   }));
@@ -313,7 +313,7 @@ async function listarCultivos() {
 function getParcelanumero(id) {
   if (!id) return 'Parcela no especificada';
   const parcela = parcelaTodo.value.find(parcela => parcela._id === id);
-  return parcela ? `${parcela.numero}` : 'Parcela no encontrada';
+  return parcela ? `${parcela.numero}-${parcela.detalle}` : 'Parcela no encontrada';
 }
 
 
@@ -385,7 +385,7 @@ function cancelarAgregarCultivo() {
 
 function editarCultivo(cultivo) {
   nombre.value = cultivo.nombre;
-const selectedParcela = parcelaTodo.value.find(parcela => parcela._id === cultivo.idParcela);
+  const selectedParcela = parcelaTodo.value.find(parcela => parcela._id === cultivo.idParcela);
   
   if (selectedParcela) {
     idParcela.value = {

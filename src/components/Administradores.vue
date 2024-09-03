@@ -73,6 +73,7 @@
                   dense
                   round
                   icon="toggle_on"
+                  color="red"
                   @click="activarAdministrador(props.row)"
                   v-if="props.row.estado == 0"
                 >
@@ -89,6 +90,7 @@
                   dense
                   round
                   icon="toggle_off"
+                  color="green"
                   @click="desactivarAdministrador(props.row)"
                   v-if="props.row.estado == 1"
                 >

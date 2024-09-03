@@ -1,6 +1,6 @@
 <template>
   <q-layout view="hHh lpR fff">
-    <q-header elevated class="bg-teal-10 text-white" height-hint="98">
+    <q-header elevated class="bg-green-8 text-white" height-hint="98">
       <q-toolbar>
         <q-btn
           dense
@@ -536,7 +536,7 @@
       <router-view />
     </q-page-container>
 
-    <q-footer elevated class="bg-teal-10 text-white">
+    <q-footer elevated class="bg-green-8 text-white">
       <q-toolbar>
         <div
           style="

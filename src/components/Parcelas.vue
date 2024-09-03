@@ -166,11 +166,11 @@
                 </h1>
               </div>
           <q-select standout v-model="idFinca" :options="organizarFincas" option-value="valor" option-label="label" label="Finca" style="background-color: #grey; margin-bottom: 20px" />
-              <q-input v-model.trim="numero" label="Numero" required />
+              <!-- <q-input v-model.trim="numero" label="Numero" required /> -->
               <q-input v-model.trim="cultivoAnterior" label="cultivo Anterior" required />
               <q-input v-model.trim="cultivoActual" label="cultivo Actual" required />
               <q-input v-model.trim="detalle" label="Detalle" required />
-              <q-input v-model.trim="area" label="Area" required />
+              <q-input v-model.number="area" type="number" label="Area" required placeholder="m2"/>
               <q-input v-model.trim="asistenteTecnico" label="asistente Tecnico" required />
                               <h3 style="font-size: 30px; margin: 0; margin-left: 15px">
                   Ubicacion
@@ -233,7 +233,7 @@ const area = ref("");
 const asistenteTecnico = ref("");
 const detalle = ref("");
 const idFinca = ref("");
-const numero = ref("");
+// const numero = ref("");
 const cultivoAnterior = ref("");
 const selectedParcelaId = ref("");
 const parcelaId = ref(null); // Para almacenar el ID del proveedor en edición
@@ -375,8 +375,8 @@ async function agregarOEditarParcela() {
 
     const data = {
       idFinca: idFincaValue, // Utiliza el valor adecuado para `POST` o `PUT`
-  ubicacionGeografica: ubicacionGeografica.value.map(geo => ({ latitud: geo.latitud, longitud: geo.longitud })),
-      numero: numero.value,
+      ubicacionGeografica: ubicacionGeografica.value.map(geo => ({ latitud: geo.latitud, longitud: geo.longitud })),
+      // numero: numero.value,
       cultivoAnterior: cultivoAnterior.value,
       cultivoActual: cultivoActual.value,
       asistenteTecnico: asistenteTecnico.value,
@@ -398,6 +398,7 @@ async function agregarOEditarParcela() {
     if (result.success) {
       listarParcelas(); // Actualiza la lista de parcelas después de agregar o editar
       showForm.value = false; // Cierra el formulario solo si la operación fue exitosa
+      
     } else {
       console.error(result.error); // Agrega un mensaje de error si la operación falla
     }
@@ -414,13 +415,12 @@ function cancelarAgregarParcela() {
   parcelaId.value = null;
   ubicacionGeografica.value = "";
   idFinca.value = "";
-  numero.value = "";
+  // numero.value = "";
   cultivoAnterior.value = "";
   cultivoActual.value = "";
   asistenteTecnico.value = "";
   area.value = "";
   detalle.value = "";
-
 }
 
 function editarParcela(parcela) {
@@ -433,7 +433,7 @@ function editarParcela(parcela) {
       nombre: selectedFinca.nombre
     };
   }
-  numero.value = parcela.numero;
+  // numero.value = parcela.numero;
   cultivoAnterior.value = parcela.cultivoAnterior;
   cultivoActual.value = parcela.cultivoActual;
   asistenteTecnico.value = parcela.asistenteTecnico;
