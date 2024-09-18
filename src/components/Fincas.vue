@@ -185,8 +185,35 @@
               <q-input v-model.trim="direccion" label="Dirección" required />
               <q-input v-model.trim="rut" label="RUT" required />
               <q-input v-model.trim="area" label="Área" required />
-              <q-input v-model.trim="ciudad" label="Ciudad" required />
-              <q-input v-model.trim="departamento" label="Departamento" required />
+              <!-- <q-input v-model.trim="ciudad" label="Ciudad" required /> -->
+              <!-- <q-select standout v-model="departamento" :options="organizardep" option-value="label" option-label="label" label="Departamento" style="background-color: #grey; margin-bottom: 20px" /> -->
+              <!-- <q-select standout v-model="ciudad" :options="organizarciu" option-value="value" option-label="label" label="Ciudad" style="background-color: #grey; margin-bottom: 20px" /> -->
+              <q-select 
+  standout 
+  v-model="departamento" 
+  :options="organizardep" 
+  option-value="label"  
+  option-label="label" 
+  label="Departamento" 
+  emit-value
+  style="background-color: #grey; margin-bottom: 20px" 
+  @update:model-value="updateCiudades"
+/>
+
+<q-select 
+  standout 
+  v-model="ciudad" 
+  :options="organizarciu" 
+  option-value="value" 
+  option-label="label" 
+  label="Ciudad" 
+  emit-value
+  style="background-color: #grey; margin-bottom: 20px"
+/>
+
+
+
+              <!-- <q-input v-model.trim="departamento" label="Departamento" required /> -->
               <q-input v-model="ubicacionGeografica[0].latitud" label="Latitud" required />
               <q-input v-model="ubicacionGeografica[0].longitud" label="Longitud" required />
               <q-input v-model="limites[0].norte" label="Límite Norte" required />
@@ -300,6 +327,7 @@ let adminTodo = ref([]);
 onMounted(async () => {
   await listarFincas();
   await listarAdministradores();
+        init()
 });
 
 async function listarAdministradores() {
@@ -388,6 +416,8 @@ async function listardesactivados() {
       console.error("Datos inesperados del servidor:", res);
       rows.value = [];
     }
+
+    console.log(JSONFinal,"estos son los departamenetos de colombiaaaaaaaaaa")
   } catch (error) {
     console.error("Error al listar fincas desactivadas:", error);
     rows.value = [];
@@ -423,6 +453,7 @@ async function agregarOEditarFinca() {
         await listarFincas();
         await listarAdministradores();
         showForm.value = false;
+        cerrar()
         // mostrarMensajeExito(fincaId.value ? "Finca actualizada exitosamente" : "Finca agregada exitosamente");
       } else {
         console.error('Respuesta inesperada del servidor:', response);
@@ -624,6 +655,59 @@ const limitescolumns = ref([
 const formatArea = (area) => {
   return `${area} m²`;
 };
+
+
+let JSONFinal = ref([]);
+
+function loadJSON(callback) {
+    var xobj = new XMLHttpRequest();
+    xobj.overrideMimeType("application/json");
+    xobj.open("GET", "src/stores/colombia.json", true);
+    xobj.onreadystatechange = function () {
+        if (xobj.readyState == 4 && xobj.status == 200) {
+            callback(xobj.responseText);
+        }
+    };
+    xobj.send(null);
+}
+
+function init() {
+    loadJSON(function (response) {
+         JSONFinal.value = JSON.parse(response);
+        console.log(JSONFinal.value); 
+     
+    });
+}
+
+const organizardep = computed(() => {
+  return JSONFinal.value.map((d) => ({
+    label: `${d.departamento}`,
+    value: `${d.departamento}`,
+    ciudades:d.ciudades
+  }));
+});
+
+
+// const organizarciu = computed(() => {
+//   // const selectedDep = JSONFinal.value.find(dep => dep.departamento === departamento);
+// });
+
+let organizarciu=ref([])
+
+function updateCiudades(departamento) {
+  const selectedDep = JSONFinal.value.find(dep => dep.departamento === departamento);
+  
+  if (selectedDep) {
+    organizarciu.value = selectedDep.ciudades.map(ciudad => ({
+      label: ciudad,
+      value: ciudad,
+    }));
+  } else {
+    organizarciu.value = [];
+  }
+}
+
+
 
 </script>
 
