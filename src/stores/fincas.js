@@ -19,6 +19,7 @@ export const useFincasStore = defineStore(
             "x-token": useUsuario.token,
           },
       });
+      console.log("Respuesta de la API:", res.data);
       fincas.value = res.data.fincas || [];
       return res.data;
   } catch (error) {

@@ -42,39 +42,6 @@ export const useGastosStore = defineStore("gasto", () => {
         }
     };
 
-    const getGastosActivas = async () => {
-        loading.value = true;
-        try {
-            const res = await axios.get(`api/gastos/listaractivados`, {
-                headers: {
-                    "x-token": useUsuario.token,
-                },
-            });
-            return res.data;
-        } catch (error) {
-            console.log(error);
-            return error;
-        } finally {
-            loading.value = false;
-        }
-    };
-
-    const getGastosInactivas = async () => {
-        loading.value = true;
-        try {
-            const res = await axios.get(`api/gastos/listardesactivados`, {
-                headers: {
-                    "x-token": useUsuario.token,
-                },
-            });
-            return res.data;
-        } catch (error) {
-            console.log(error);
-            return error;
-        } finally {
-            loading.value = false;
-        }
-    };
 
     const postGastos = async (data) => {
         loading.value = true;
@@ -138,34 +105,11 @@ export const useGastosStore = defineStore("gasto", () => {
         }
     };
 
-    const toggleEstadoGastos = async (id, activar) => {
-        loading.value = true;
-        try {
-            const url = activar
-                ? `api/gastos/activar/${id}`
-                : `api/gastos/desactivar/${id}`;
-            const req = await axios.put(url, {}, {
-                headers: {
-                    "x-token": useUsuario.token,
-                },
-            });
-            return req.data;
-        } catch (error) {
-            console.log(error);
-            return error;
-        } finally {
-            loading.value = false;
-        }
-    };
-
     return {
         getGastos,
         getGastosByID,
-        getGastosActivas,
-        getGastosInactivas,
         postGastos,
         putGastos,
-        toggleEstadoGastos,
         loading,
     };
 }, {

@@ -138,10 +138,11 @@
                   Insumo
                 </h1>
               </div>
+
               <q-select
-                v-model="idProveedor"
-                label="Proveedor"
-                :options="proveedoresOptions"
+                v-model="idFinca"
+                label="Finca"
+                :options="fincasOptions"
                 emit-value
                 map-options
                 option-value="value"
@@ -149,6 +150,16 @@
                 required
               />
               <q-input v-model.trim="nombre" label="Nombre" required />
+              <q-input
+                v-model.trim="registroICA"
+                label="Registro ICA"
+                required
+              />
+              <q-input
+                v-model.trim="registroINVIMA"
+                label="Registro INVIMA"
+                required
+              />
               <q-input
                 v-model.trim="relacionNPK"
                 label="Relación NPK"
@@ -160,28 +171,20 @@
                 type="number"
                 required
               />
-              <q-input
-                v-model.trim="unidad"
+              <q-select
+                v-model="unidad"
                 label="Unidad"
-                type="number"
+                :options="[
+                  { label: 'Kilogramos (kg)', value: 'kg' },
+                  { label: 'Litros (lts)', value: 'lts' },
+                ]"
+                emit-value
+                map-options
+                option-value="value"
+                option-label="label"
                 required
               />
-              <q-input
-                v-model.trim="responsable"
-                label="Responsable"
-                required
-              />
-              <q-input
-                v-model.trim="observaciones"
-                label="Observaciones"
-                required
-              />
-              <q-input
-                v-model.trim="total"
-                label="Total"
-                type="number"
-                required
-              />
+              <q-input v-model.trim="observaciones" label="Observaciones" />
 
               <div
                 style="margin-top: 15px; display: flex; justify-content: center"
@@ -198,6 +201,7 @@
           </q-card-section>
         </q-card>
       </q-dialog>
+
       <div v-if="useInsumos.loading" class="overlay">
         <q-spinner size="xl" color="primary" />
       </div>
@@ -208,14 +212,16 @@
 <script setup>
 import { ref, watch } from "vue";
 import { useInsumosStore } from "../stores/insumos.js";
-import { useProveedorStore } from "../stores/proveedores.js";
+import { useFincasStore } from "../stores/fincas.js";
 
 const showForm = ref(false);
-const idProveedor = ref("");
+const idFinca = ref("");
 const nombre = ref("");
+const registroICA = ref("");
+const registroINVIMA = ref("");
 const relacionNPK = ref("");
 const cantidad = ref(0);
-const unidad = ref(0);
+const unidad = ref("");
 const responsable = ref("");
 const observaciones = ref("");
 const total = ref(0);
@@ -225,10 +231,10 @@ const selectedInsumoId = ref("");
 const rows = ref([]);
 const columns = ref([
   {
-    name: "idProveedor",
-    label: "Proveedor",
+    name: "id_finca",
+    label: "Finca",
     align: "center",
-    field: "nombreProveedor",
+    field: "nombreFinca",
   },
   {
     name: "nombre",
@@ -237,30 +243,36 @@ const columns = ref([
     field: "nombre",
   },
   {
-    name: "relacionNPK",
-    label: "Relación NPK",
+    name: "registro_ica",
+    label: "Registro Ica",
     align: "center",
-    field: "relacionNPK",
+    field: "registro_ica",
+  },
+  {
+    name: "resgistro_invima",
+    label: "Registro Invima",
+    align: "center",
+    field: "registro_invima",
+  },
+  {
+    name: "relacion_NPK",
+    label: "Relacion NPK",
+    align: "center",
+    field: "relacion_NPK",
+  },
+  {
+    name: "unidad",
+    label: "Unidad",
+    align: "center",
+    field: "unidad",
   },
   { name: "cantidad", label: "Cantidad", align: "center", field: "cantidad" },
-  { name: "unidad", label: "Unidad", align: "center", field: "unidad" },
-  {
-    name: "responsable",
-    label: "Responsable",
-    align: "center",
-    field: "responsable",
-  },
+
   {
     name: "observaciones",
     label: "Observaciones",
     align: "center",
     field: "observaciones",
-  },
-  {
-    name: "total",
-    label: "Total",
-    align: "center",
-    field: "total",
   },
   {
     name: "estado",
@@ -271,56 +283,62 @@ const columns = ref([
   { name: "opciones", label: "Opciones", align: "center", field: "opciones" },
 ]);
 
-const proveedoresOptions = ref([]);
+const fincasOptions = ref([]); // Cambiado de proveedoresOptions a fincasOptions
 const insumoOptions = ref([]);
 
 const useInsumos = useInsumosStore();
-const useProveedores = useProveedorStore();
+const useFincas = useFincasStore();
 
 async function listarInsumos() {
   try {
     const r = await useInsumos.getInsumos();
-    const proveedores = await useProveedores.getProveedores();
+    console.log("Insumos obtenidos:", r.insumos); // Verificar los insumos
+
+    const fincasResponse = await useFincas.listarFinca();
+    console.log("Respuesta completa de listarFinca:", fincasResponse); // Verificar la respuesta completa
+
+    // Cambiado a `fincasResponse.finca` ya que la respuesta devuelve `finca` y no `fincas`
+    const fincas = fincasResponse.finca || []; 
+
     rows.value = r.insumos.map((insumo) => {
-      const proveedor = proveedores.proveedores.find(
-        (e) => e._id === insumo.idProveedor
-      );
+      const finca = fincas.find((e) => e._id === insumo.id_finca);
+      console.log(`Insumo: ${insumo.nombre}, ID Finca: ${insumo.id_finca}, Finca encontrada:`, finca);
       return {
         ...insumo,
-        nombreProveedor: proveedor ? proveedor.nombre : "Desconocido",
+        nombreFinca: finca ? finca.nombre : "Desconocido", // Si no se encuentra la finca
       };
     });
+
     insumoOptions.value = r.insumos.map((insumo) => {
-      const proveedor = proveedores.proveedores.find(
-        (e) => e._id === insumo.idProveedor
-      );
-      const nombreProveedor = proveedor ? proveedor.nombre : "Desconocido";
-      
+      const finca = fincas.find((e) => e._id === insumo.id_finca);
+      const nombreFinca = finca ? finca.nombre : "Desconocido";
       return {
-        label: `${insumo.nombre} - Proveedor ${nombreProveedor}`,
+        label: `${insumo.nombre} - Finca ${nombreFinca}`,
         value: insumo._id,
       };
     });
   } catch (error) {
-    console.error(error);
+    console.error('Error al listar insumos o fincas:', error);
   }
 }
+
+
 
 async function listarInsumosActivos() {
   try {
     const r = await useInsumos.getInsumosActivas();
-    const proveedores = await useProveedores.getProveedores();
+    const fincasResponse = await useFincas.listarFinca();
+    const fincas = fincasResponse.finca || []; // Asegurar que el campo es 'finca'
+
     rows.value = r.activados.map((insumo) => {
-      const proveedor = proveedores.proveedores.find(
-        (e) => e._id === insumo.idProveedor
-      );
+      const finca = fincas.find((e) => e._id === insumo.id_finca); // id_finca en vez de idFinca
       return {
         ...insumo,
-        nombreProveedor: proveedor ? proveedor.nombre : "Desconocido",
+        nombreFinca: finca ? finca.nombre : "Desconocido",
       };
     });
   } catch (error) {
-    console.error(error);
+    console.error('Error al listar insumos activos:', error);
     rows.value = [];
   }
 }
@@ -328,18 +346,18 @@ async function listarInsumosActivos() {
 async function listarInsumosInactivos() {
   try {
     const r = await useInsumos.getInsumosInactivas();
-    const proveedores = await useProveedores.getProveedores();
+    const fincasResponse = await useFincas.listarFinca();
+    const fincas = fincasResponse.finca || []; // Corregido a 'finca'
+
     rows.value = r.desactivados.map((insumo) => {
-      const proveedor = proveedores.proveedores.find(
-        (e) => e._id === insumo.idProveedor
-      );
+      const finca = fincas.find((e) => e._id === insumo.id_finca); // id_finca en vez de idFinca
       return {
         ...insumo,
-        nombreProveedor: proveedor ? proveedor.nombre : "Desconocido",
+        nombreFinca: finca ? finca.nombre : "Desconocido",
       };
     });
   } catch (error) {
-    console.error(error);
+    console.error('Error al listar insumos inactivos:', error);
     rows.value = [];
   }
 }
@@ -347,21 +365,23 @@ async function listarInsumosInactivos() {
 async function obtenerInsumoPorID(selectedInsumoId) {
   try {
     const r = await useInsumos.getInsumosByID(selectedInsumoId);
-    const proveedores = await useProveedores.getProveedores();
+    const fincasResponse = await useFincas.listarFinca();
+    const fincas = fincasResponse.finca || []; // Asegurarse de que es 'finca'
+
     if (r.insumo) {
-      const proveedor = proveedores.proveedores.find(
-        (e) => e._id === r.insumo.idProveedor
-      );
-      rows.value = [{
-        ...r.insumo,
-        nombreProveedor: proveedor ? proveedor.nombre : "Desconocido",
-      }];
+      const finca = fincas.find((e) => e._id === r.insumo.id_finca); // id_finca en vez de idFinca
+      rows.value = [
+        {
+          ...r.insumo,
+          nombreFinca: finca ? finca.nombre : "Desconocido",
+        },
+      ];
     } else {
-      console.error("No se encontró ninguna insumo con el ID proporcionado");
+      console.error("No se encontró ningún insumo con el ID proporcionado");
       rows.value = [];
     }
   } catch (error) {
-    console.error(error);
+    console.error('Error al obtener el insumo por ID:', error);
     rows.value = [];
   }
 }
@@ -369,14 +389,15 @@ async function obtenerInsumoPorID(selectedInsumoId) {
 async function agregarOEditarInsumo() {
   try {
     const data = {
-      idProveedor: idProveedor.value,
+      id_finca: idFinca.value, // Corregido a id_finca
       nombre: nombre.value,
-      relacionNPK: relacionNPK.value,
+      registro_ica: registroICA.value,
+      registro_invima: registroINVIMA.value,
+      relacion_NPK: relacionNPK.value,
       cantidad: cantidad.value,
       unidad: unidad.value,
-      responsable: responsable.value,
       observaciones: observaciones.value,
-      total: total.value,
+      estado: 1,
     };
 
     let result;
@@ -393,7 +414,7 @@ async function agregarOEditarInsumo() {
       showForm.value = false;
     }
   } catch (error) {
-    console.error(error);
+    console.error('Error al agregar o editar insumo:', error);
   }
 }
 
@@ -404,14 +425,14 @@ function cancelarAgregarInsumo() {
 
 function editarInsumo(insumo) {
   insumoId.value = insumo._id;
-  idProveedor.value = insumo.idProveedor;
+  idFinca.value = insumo.id_finca; // Corregido a id_finca
   nombre.value = insumo.nombre;
-  relacionNPK.value = insumo.relacionNPK;
+  registroICA.value = insumo.registro_ica;
+  registroINVIMA.value = insumo.registro_invima;
+  relacionNPK.value = insumo.relacion_NPK;
   cantidad.value = insumo.cantidad;
   unidad.value = insumo.unidad;
-  responsable.value = insumo.responsable;
   observaciones.value = insumo.observaciones;
-  total.value = insumo.total;
   showForm.value = true;
 }
 
@@ -420,7 +441,7 @@ async function activarInsumo(insumo) {
     await useInsumos.toggleEstadoInsumos(insumo._id, true);
     listarInsumos();
   } catch (error) {
-    console.error(error);
+    console.error('Error al activar insumo:', error);
   }
 }
 
@@ -429,37 +450,38 @@ async function desactivarInsumo(insumo) {
     await useInsumos.toggleEstadoInsumos(insumo._id, false);
     listarInsumos();
   } catch (error) {
-    console.error(error);
+    console.error('Error al desactivar insumo:', error);
   }
 }
 
 function resetForm() {
   insumoId.value = null;
-  idProveedor.value = "";
+  idFinca.value = "";
   nombre.value = "";
+  registroICA.value = "";
+  registroINVIMA.value = "";
   relacionNPK.value = "";
   cantidad.value = 0;
-  unidad.value = 0;
-  responsable.value = "";
+  unidad.value = "";
   observaciones.value = "";
   total.value = 0;
 }
 
-async function cargarProveedores() {
+async function cargarFincas() {
   try {
-    const r = await useProveedores.getProveedores();
-    proveedoresOptions.value = r.proveedores.map((proveedor) => ({
-      value: proveedor._id,
-      label: proveedor.nombre,
-    }));
+    const r = await useFincas.listarFinca();
+    fincasOptions.value = r.finca.map((finca) => ({
+      value: finca._id,
+      label: finca.nombre,
+    })); // Corregido a r.finca
   } catch (error) {
-    console.error(error);
+    console.error('Error al cargar fincas:', error);
   }
 }
 
 watch(showForm, (newVal) => {
   if (newVal) {
-    cargarProveedores();
+    cargarFincas();
   }
 });
 

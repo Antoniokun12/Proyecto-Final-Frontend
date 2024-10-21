@@ -208,7 +208,7 @@ const showPassword = ref(false);
 
 const rows = ref([]);
 const columns = ref([
-  { name: "idCultivo", label: "Finca", align: "center",     field: row => getCultivonombre(row.idCultivo) },
+  { name: "idCultivo", label: "Cultivo", align: "center",     field: row => getCultivonombre(row.idCultivo) },
 
   {
     name: "Nlote",

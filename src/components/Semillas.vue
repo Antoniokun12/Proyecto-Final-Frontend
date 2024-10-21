@@ -139,18 +139,24 @@
                 </h1>
               </div>
               <q-select
-                v-model="idProveedor"
-                label="Proveedor"
-                :options="proveedoresOptions"
+                v-model="idFinca"
+                label="Finca"
+                :options="fincasOptions"
                 emit-value
                 map-options
                 option-value="value"
                 option-label="label"
                 required
               />
+              <q-input v-model.trim="nombre" label="Nombre" required />
               <q-input
-                v-model.trim="numFactura"
-                label="Número de Factura"
+                v-model.trim="registroIca"
+                label="Registro ICA"
+                required
+              />
+              <q-input
+                v-model.trim="registroInvima"
+                label="Registro INVIMA"
                 required
               />
               <q-input
@@ -159,9 +165,13 @@
                 label="Fecha de vencimiento"
                 required
               />
-              <q-input v-model.trim="especie" label="Especie" required />
               <q-input
-                v-model.trim="NumLote"
+                v-model.trim="especieVariedad"
+                label="Especie y Variedad"
+                required
+              />
+              <q-input
+                v-model.trim="numLote"
                 label="Número de Lote"
                 required
                 type="number"
@@ -173,17 +183,12 @@
                 required
               />
               <q-input
-                v-model.trim="unidadtotal"
-                label="Unidades Totales"
+                v-model.trim="cantidad"
+                label="Cantidad en Kg(Kilogramo)"
                 required
                 type="number"
               />
-              <q-input
-                v-model.trim="total"
-                label="Total"
-                required
-                type="number"
-              />
+              <q-input v-model.trim="observaciones" label="Observaciones" />
 
               <div
                 style="margin-top: 15px; display: flex; justify-content: center"
@@ -210,118 +215,62 @@
 <script setup>
 import { ref, watch } from "vue";
 import { useSemillasStore } from "../stores/semillas.js";
-import { useProveedorStore } from "../stores/proveedores.js";
+import { useFincasStore } from "../stores/fincas.js"; // Cambié a finca
 
 const showForm = ref(false);
-const idProveedor = ref("");
-const numFactura = ref("");
-const fechaCompra = ref(null);
+const idFinca = ref("");
+const nombre = ref(""); 
+const registroIca = ref(""); 
+const registroInvima = ref(""); 
 const fechaVencimiento = ref(null);
-const especie = ref("");
-const NumLote = ref(0);
+const especieVariedad = ref(""); 
+const numLote = ref("");
 const origen = ref("");
 const poderGerminativo = ref("");
-const unidadtotal = ref(0);
-const total = ref(0);
-const selectedSemillaId = ref("");
-let semillaId = ref(null);
+const cantidad = ref(0);
+const observaciones = ref(""); 
+const semillaId = ref(null);
 
 const rows = ref([]);
 const columns = ref([
-  {
-    name: "idProveedor",
-    label: "Proveedor",
-    align: "center",
-    field: "nombreProveedor",
-  },
-  {
-    name: "numFactura",
-    label: "Número de Factura",
-    align: "center",
-    field: "numFactura",
-  },
-  {
-    name: "fechaCompra",
-    label: "Fecha de Compra",
-    align: "center",
-    field: "fechaCompra",
-    format: (val) => {
-      const fecha = new Date(val);
-      const opcionesFecha = {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      };
-      const fechaFormateada = fecha.toLocaleDateString("es-ES", opcionesFecha);
-
-      return fechaFormateada;
-    },
-  },
-  {
-    name: "fechaVencimiento",
-    label: "Fecha de Vencimiento",
-    align: "center",
-    field: "fechaVencimiento",
-    format: (val) => {
-      const fecha = new Date(val);
-      const opcionesFecha = {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      };
-      const fechaFormateada = fecha.toLocaleDateString("es-ES", opcionesFecha);
-
-      return fechaFormateada;
-    },
-  },
-  { name: "especie", label: "Especie", align: "center", field: "especie" },
-  {
-    name: "NumLote",
-    label: "Número de Lote",
-    align: "center",
-    field: "NumLote",
-  },
+  { name: "id_finca", label: "Finca", align: "center", field: "nombreFinca" },
+  { name: "nombre", label: "Nombre", align: "center", field: "nombre" },
+  { name: "registro_ica", label: "Registro ICA", align: "center", field: "registro_ica" },
+  { name: "registro_invima", label: "Registro INVIMA", align: "center", field: "registro_invima" },
+  { name: "fechaVencimiento", label: "Fecha de Vencimiento", align: "center", field: "fechaVencimiento", format: (val) => new Date(val).toLocaleDateString("es-ES") },
+  { name: "especie_variedad", label: "Especie o Variedad", align: "center", field: "especie_variedad" },
+  { name: "numLote", label: "Número de Lote", align: "center", field: "numLote" },
   { name: "origen", label: "Origen", align: "center", field: "origen" },
-  {
-    name: "poderGerminativo",
-    label: "Poder Germinativo",
-    align: "center",
-    field: "poderGerminativo",
-  },
-  {
-    name: "unidadtotal",
-    label: "Unidades Totales",
-    align: "center",
-    field: "unidadtotal",
-  },
-  { name: "total", label: "Total", align: "center", field: "total" },
+  { name: "poderGerminativo", label: "Poder Germinativo", align: "center", field: "poderGerminativo" },
+  { name: "unidad", label: "Unidad", align: "center", field: "unidad" },
+  { name: "cantidad", label: "Cantidad", align: "center", field: "cantidad" },
+  { name: "observaciones", label: "Observaciones", align: "center", field: "observaciones" },
   { name: "estado", label: "Estado", align: "center", field: "estado" },
   { name: "opciones", label: "Opciones", align: "center", field: "opciones" },
 ]);
 
 const semillaOptions = ref([]);
+const fincasOptions = ref([]);
 
 const useSemillas = useSemillasStore();
-const useProveedores = useProveedorStore();
-
-const proveedoresOptions = ref([]);
+const useFincas = useFincasStore();
 
 async function listarSemillas() {
   try {
     const r = await useSemillas.getSemillas();
-    const proveedores = await useProveedores.getProveedores();
-    // console.log(r);
-    rows.value = r.semillas.map((semillas) => {
-      const proveedor = proveedores.proveedores.find(
-        (e) => e._id === semillas.idProveedor
-      );
+    const fincasResponse = await useFincas.listarFinca();
+    const fincas = fincasResponse.finca || [];
+
+    rows.value = r.semillas.map((semilla) => {
+      const finca = fincas.find((e) => e._id === semilla.id_finca);
       return {
-        ...semillas,
-        nombreProveedor: proveedor ? proveedor.nombre : "Desconocido",
+        ...semilla,
+        nombreFinca: finca ? finca.nombre : "Desconocido",
       };
     });
+
     semillaOptions.value = r.semillas.map((semilla) => ({
-      label: semilla.especie,
+      label: semilla.nombre,
       value: semilla._id,
     }));
   } catch (error) {
@@ -333,14 +282,14 @@ async function listarSemillas() {
 async function listarSemillasActivas() {
   try {
     const r = await useSemillas.getSemillasActivas();
-    const proveedores = await useProveedores.getProveedores();
-    rows.value = r.activados.map((semillas) => {
-      const proveedor = proveedores.proveedores.find(
-        (e) => e._id === semillas.idProveedor
-      );
+    const fincasResponse = await useFincas.listarFinca();
+    const fincas = fincasResponse.finca || [];
+
+    rows.value = r.activados.map((semilla) => {
+      const finca = fincas.find((e) => e._id === semilla.id_finca);
       return {
-        ...semillas,
-        nombreProveedor: proveedor ? proveedor.nombre : "Desconocido",
+        ...semilla,
+        nombreFinca: finca ? finca.nombre : "Desconocido",
       };
     });
   } catch (error) {
@@ -352,14 +301,14 @@ async function listarSemillasActivas() {
 async function listarSemillasInactivas() {
   try {
     const r = await useSemillas.getSemillasInactivas();
-    const proveedores = await useProveedores.getProveedores();
-    rows.value = r.desactivados.map((semillas) => {
-      const proveedor = proveedores.proveedores.find(
-        (e) => e._id === semillas.idProveedor
-      );
+    const fincasResponse = await useFincas.listarFinca();
+    const fincas = fincasResponse.finca || [];
+
+    rows.value = r.desactivados.map((semilla) => {
+      const finca = fincas.find((e) => e._id === semilla.id_finca);
       return {
-        ...semillas,
-        nombreProveedor: proveedor ? proveedor.nombre : "Desconocido",
+        ...semilla,
+        nombreFinca: finca ? finca.nombre : "Desconocido",
       };
     });
   } catch (error) {
@@ -371,15 +320,17 @@ async function listarSemillasInactivas() {
 async function obtenerSemillaPorID(selectedSemillaId) {
   try {
     const r = await useSemillas.getSemillasByID(selectedSemillaId);
-    const proveedores = await useProveedores.getProveedores();
+    const fincasResponse = await useFincas.listarFinca();
+    const fincas = fincasResponse.finca || [];
+
     if (r.semilla) {
-      const proveedor = proveedores.proveedores.find(
-        (e) => e._id === r.semilla.idProveedor
-      );
-      rows.value = [{
-        ...r.semilla,
-        nombreProveedor: proveedor ? proveedor.nombre : "Desconocido",
-      }];
+      const finca = fincas.find((e) => e._id === r.semilla.id_finca);
+      rows.value = [
+        {
+          ...r.semilla,
+          nombreFinca: finca ? finca.nombre : "Desconocido",
+        },
+      ];
     } else {
       console.error("No se encontró ninguna semilla con el ID proporcionado");
       rows.value = [];
@@ -396,30 +347,33 @@ function cancelarAgregarSemilla() {
 }
 
 function limpiarFormulario() {
-  idProveedor.value = "";
-  numFactura.value = "";
-  fechaCompra.value = null;
+  idFinca.value = "";
+  nombre.value = "";
+  registroIca.value = "";
+  registroInvima.value = "";
   fechaVencimiento.value = null;
-  especie.value = "";
-  NumLote.value = 0;
+  especieVariedad.value = "";
+  numLote.value = 0;
   origen.value = "";
   poderGerminativo.value = "";
-  unidadtotal.value = 0;
-  total.value = 0;
+  cantidad.value = 0;
+  observaciones.value = "";
   semillaId.value = null;
 }
 
 async function agregarOEditarSemilla() {
   const semillaData = {
-    idProveedor: idProveedor.value,
-    numFactura: numFactura.value,
+    id_finca: idFinca.value,
+    nombre: nombre.value,
+    registro_ica: registroIca.value,
+    registro_invima: registroInvima.value,
     fechaVencimiento: fechaVencimiento.value,
-    especie: especie.value,
-    NumLote: NumLote.value,
+    especie_variedad: especieVariedad.value,
+    numLote: numLote.value,
     origen: origen.value,
     poderGerminativo: poderGerminativo.value,
-    unidadtotal: unidadtotal.value,
-    total: total.value,
+    cantidad: cantidad.value,
+    observaciones: observaciones.value,
   };
 
   try {
@@ -437,33 +391,32 @@ async function agregarOEditarSemilla() {
 }
 
 async function editarSemilla(semillas) {
-  idProveedor.value = semillas.idProveedor;
-  numFactura.value = semillas.numFactura;
-  fechaVencimiento.value = new Date(semillas.fechaVencimiento)
-    .toISOString()
-    .substring(0, 10);
-  especie.value = semillas.especie;
-  NumLote.value = semillas.NumLote;
+  idFinca.value = semillas.id_finca;
+  nombre.value = semillas.nombre;
+  registroIca.value = semillas.registro_ica;
+  registroInvima.value = semillas.registro_invima;
+  fechaVencimiento.value = new Date(semillas.fechaVencimiento).toISOString().substring(0, 10);
+  especieVariedad.value = semillas.especie_variedad;
+  numLote.value = semillas.numLote;
   origen.value = semillas.origen;
   poderGerminativo.value = semillas.poderGerminativo;
-  unidadtotal.value = semillas.unidadtotal;
-  total.value = semillas.total;
+  cantidad.value = semillas.cantidad;
+  observaciones.value = semillas.observaciones;
   semillaId.value = semillas._id;
   showForm.value = true;
 }
 
-async function listarProveedores() {
+async function cargarFincas() {
   try {
-    const r = await useProveedores.getProveedores();
-    proveedoresOptions.value = r.proveedores.map((proveedor) => ({
-      label: proveedor.nombre,
-      value: proveedor._id,
-    }));
+    const r = await useFincas.listarFinca();
+    fincasOptions.value = r.finca.map((finca) => ({
+      value: finca._id,
+      label: finca.nombre,
+    })); // Corregido a r.finca
   } catch (error) {
-    console.error(error);
+    console.error('Error al cargar fincas:', error);
   }
 }
-
 async function activarSemilla(row) {
   await useSemillas.toggleEstadoSemillas(row._id, true);
   listarSemillas();
@@ -480,9 +433,18 @@ watch(showForm, (newVal) => {
   }
 });
 
+watch(showForm, (newVal) => {
+  if (newVal) {
+    cargarFincas();
+  }
+});
+
+
 listarSemillas();
-listarProveedores();
+
 </script>
+
+
 
 <style scoped>
 .overlay {
