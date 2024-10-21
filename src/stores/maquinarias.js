@@ -131,6 +131,94 @@ export const useMaquinariasStore = defineStore("maquinarias", () => {
             loading.value = false;
         }
     };
+    let putAgregarMantenimiento = async (id, data) => {
+        try {
+          let response = await axios.put(`api/maquinasherramienta/agregamantenimiento/${id}`, data, {
+            headers: {
+              "x-token": useUsuario.token,
+            },
+          });
+          return { success: true, data: response.data };
+        } catch (error) {
+          console.error("Error en putAgregarMantenimiento:", error);
+          return {
+            success: false,
+            error: error.response?.data?.error || "Error al agregar mantenimiento"
+          };
+        }
+      };
+      
+      let putEditarMantenimiento = async (maquinaId, mantenimientoId, mantenimientoData) => {
+        try {
+          const response = await axios.put(
+            `/api/maquinasherramienta/editamantenimiento/${maquinaId}/${mantenimientoId}`,
+            mantenimientoData,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                "x-token": useUsuario.token,
+              },
+            }
+          );
+          return { success: true, data: response.data };
+        } catch (error) {
+          console.error("Error en putEditarMantenimiento:", error);
+          return {
+            success: false,
+            error: error.response?.data?.error || "Error al editar mantenimiento"
+          };
+        }
+      };
+    let putAgregarProductoDesinfeccion = async (id, data) => {
+        loading.value = true;
+        try {
+            let req = await axios.put(`api/maquinasherramienta/desinfeccion/${id}`, data, {
+                headers: {
+                    "x-token": useUsuario.token,
+                },
+            });
+            Notify.create({
+                message: `Desinfección agregado correctamente`,
+                color: "positive",
+                position: "top",
+            });
+            return { success: true };
+        } catch (error) {
+            Notify.create({
+                type: "negative",
+                message: error.response.data.errors[0].msg,
+            });
+            return { success: false };
+        } finally {
+            loading.value = false;
+        }
+    };
+
+    let putEditarProductoDesinfeccion = async (id, desinfeccionId, productoId, data) => {
+        loading.value = true;
+        try {
+            let req = await axios.put(`api/maquinasherramienta/editardesinfeccion/${id}/desinfeccion/${desinfeccionId}/producto/${productoId}`, data, {
+                headers: {
+                    "x-token": useUsuario.token,
+                },
+            });
+            Notify.create({
+                message: `Desinfección editada correctamente`,
+                color: "positive",
+                position: "top",
+            });
+            return { success: true };
+        } catch (error) {
+            Notify.create({
+                type: "negative",
+                message: error.response.data.errors[0].msg,
+            });
+            return { success: false };
+        } finally {
+            loading.value = false;
+        }
+    };
+    
 
     let toggleEstadoMaquinarias = async (id, activar) => {
         loading.value = true;
@@ -161,6 +249,10 @@ export const useMaquinariasStore = defineStore("maquinarias", () => {
         getMaquinariasByID,
         postMaquinarias,
         putMaquinarias,
+        putAgregarMantenimiento,
+        putEditarMantenimiento,
+        putAgregarProductoDesinfeccion,
+        putEditarProductoDesinfeccion,
         toggleEstadoMaquinarias,
         loading,
 
